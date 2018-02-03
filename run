@@ -4,19 +4,11 @@ tgcli_version="170904-nightly"
 luarocks_version=2.4.2
 
 lualibs=(
-	'redis-lua'
-	'serpent'
+ 'redis-lua'
+ 'serpent'
 )
 
-tgcli_version="170904-nightly"
-luarocks_version=2.4.2
-
-lualibs=(
-	'redis-lua'
-	'serpent'
-)
-
-today=`date +%F`
+today=date +%F
 
 get_sub() {
     local flag=false c count cr=$'\r' nl=$'\n'
@@ -47,15 +39,11 @@ sudo apt autoremove
 chmod +x run && chmod 777 run && chmod +x bot/Tabchi.lua
 }
 make_progress() {
-exe=`lua <<-EOF
+exe=lua <<-EOF
     print(tonumber($1)/tonumber($2)*100)
 EOF
-`
-    echo ${exe:0:4}
-}
 
-function get_tgcli_version() {
-	echo "$tgcli_version"
+    echo ${exe:0:4}
 }
 
 function download_libs_lua() {
@@ -64,7 +52,7 @@ function download_libs_lua() {
     local i
     for ((i=0;i<${#lualibs[@]};i++)); do
         printf "\r\33[2K"
-        printf "\rReza Khosrobegi: wait... [`make_progress $(($i+1)) ${#lualibs[@]}`%%] [$(($i+1))/${#lualibs[@]}] ${lualibs[$i]}"
+        printf "\rwait... [make_progress $(($i+1)) ${#lualibs[@]}%%] [$(($i+1))/${#lualibs[@]}] ${lualibs[$i]}"
         ./.luarocks/bin/luarocks install ${lualibs[$i]} &>> logs/logluarocks_${today}.txt
     done
     sleep 0.2
@@ -97,7 +85,7 @@ function configure() {
     mkdir $HOME/.telegram-bot; cat <<EOF > $HOME/.telegram-bot/config
 default_profile = "main";
 main = {
-  lua_script = "$HOME/ExtraTab-V2/ExtraTab.lua";
+  lua_script = "$HOME/tabchi/bot/Tabchi.lua";
 };
 EOF
     printf "\nDone\n"
@@ -112,34 +100,30 @@ function login_bot() {
 }
 
 function show_logo() {
-    #Adding some color. By @Edward_Jason :D
     echo -e "\033[38;5;208m"
     echo -e "\t Tabchi has been runned ..."
 }
 
 case $1 in
     install)
-	    install_config
-    	configure ${2}
+     install_config
+     configure ${2}
     exit ;;
     login)
         echo "Your Bot Number: "
         read phone_number
         login_bot ${phone_number}
     exit ;;
-	tgcli_version)
-		get_tgcli_version
-	exit ;;
-	help)
-		echo "  Commands:                                                           "
-		echo "	install - First command to install all repos and download binary.   "
-		echo "	login - Access into your telegram account .                          "
-		echo "	auto - For Runnig Soure Automaticly .                                "
-	exit ;;
-	auto)
-	   show_logo
+ help)
+  echo "  Commands:                                                           "
+  echo " install - First command to install all repos and download binary.   "
+  echo " login - Access into your telegram account .                          "
+  echo " auto - For Runnig Soure Automaticly .                                "
+ exit ;;
+ auto)
+    show_logo
        start_bot $@
-	exit ;;
+ exit ;;
 esac
 RED='\033[0;31m'
 NC='\033[0m'
